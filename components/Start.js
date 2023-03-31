@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { getAuth, signInAnonymously } from 'firebase/auth';
 import {
   StyleSheet,
   View,
@@ -7,12 +8,28 @@ import {
   ImageBackground,
   TouchableOpacity,
   KeyboardAvoidingView,
-  Platform,
+  Platform, Alert
 } from 'react-native';
 
 const Start = ({ navigation }) => {
+  const auth = getAuth();
   const [name, setName] = useState('');
   const [color, setColor] = useState('');
+
+  const signInUser = () => {
+    signInAnonymously(auth)
+      .then((result) => {
+        navigation.navigate('Chat', {
+          userID: result.user.uid,
+          name: name,
+          color: color,
+        });
+        Alert.alert('Signed in Successfully!');
+      })
+      .catch((error) => {
+        Alert.alert('Unable to sign in, try later again.');
+      });
+  };
 
   return (
     <View style={styles.container}>
@@ -20,7 +37,7 @@ const Start = ({ navigation }) => {
         source={require('../img/background-image.png')}
         style={styles.image}
       >
-        <Text style={styles.appTitle}>Welcome to ChatMate!</Text>
+        <Text style={styles.appTitle}>Welcome to ChatMate</Text>
         <View style={styles.box}>
           <TextInput
             style={styles.usernameInput}
@@ -39,40 +56,35 @@ const Start = ({ navigation }) => {
                 accessibilityHint='Lets you choose the chats background color'
                 accessibilityRole='button'
                 style={[styles.color, styles.black]}
-                onPress={() => setColor('#090C08')}
+                onPress={() => setColor('#141E32')}
               ></TouchableOpacity>
               <TouchableOpacity
                 accessible={true}
-                accessibilityLabel='Purple'
+                accessibilityLabel='Gray'
                 accessibilityHint='Lets you choose the chats background color'
                 accessibilityRole='button'
-                style={[styles.color, styles.purple]}
-                onPress={() => setColor('#474056')}
+                style={[styles.color, styles.gray]}
+                onPress={() => setColor('#697C91')}
               ></TouchableOpacity>
               <TouchableOpacity
                 accessible={true}
-                accessibilityLabel='Light blue'
-                accessibilityHint='Lets you choose the chats background color'
-                accessibilityRole='button'
-                style={[styles.color, styles.blue]}
-                onPress={() => setColor('#8A95A5')}
-              ></TouchableOpacity>
-              <TouchableOpacity
-                accessible={true}
-                accessibilityLabel='Light green'
+                accessibilityLabel='Green'
                 accessibilityHint='Lets you choose the chats background color'
                 accessibilityRole='button'
                 style={[styles.color, styles.green]}
-                onPress={() => setColor('#B9C6AE')}
+                onPress={() => setColor('#5A858A')}
+              ></TouchableOpacity>
+              <TouchableOpacity
+                accessible={true}
+                accessibilityLabel='Rose'
+                accessibilityHint='Lets you choose the chats background color'
+                accessibilityRole='button'
+                style={[styles.color, styles.rose]}
+                onPress={() => setColor('#B28C97')}
               ></TouchableOpacity>
             </View>
           </View>
-          <TouchableOpacity
-            style={styles.button}
-            onPress={() =>
-              navigation.navigate('Chat', { name: name, color: color })
-            }
-          >
+          <TouchableOpacity style={styles.button} onPress={signInUser}>
             <Text style={styles.buttonText}>Start Chatting</Text>
           </TouchableOpacity>
         </View>
@@ -144,22 +156,23 @@ const styles = StyleSheet.create({
     borderRadius: 25,
   },
   black: {
-    backgroundColor: '#090C08',
+    backgroundColor: '#141E32',
   },
-  purple: {
-    backgroundColor: '#474056',
-  },
-  blue: {
-    backgroundColor: '#8A95A5',
+  gray: {
+    backgroundColor: '#697C91',
   },
   green: {
-    backgroundColor: '#B9C6AE',
+    backgroundColor: '#5A858A',
+  },
+  rose: {
+    backgroundColor: '#B28C97',
   },
   button: {
     width: '88%',
     padding: 20,
     marginBottom: 25,
-    backgroundColor: '#757083',
+    // backgroundColor: '#757083',
+    backgroundColor: '#1F435B',
     alignItems: 'center',
     alignSelf: 'center',
   },
