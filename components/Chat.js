@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { StyleSheet, View, KeyboardAvoidingView, Platform } from 'react-native';
 import { GiftedChat, Bubble, InputToolbar } from 'react-native-gifted-chat';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import {
   collection,
   addDoc,
@@ -9,33 +10,11 @@ import {
   orderBy,
 } from 'firebase/firestore';
 
-const Chat = ({ route, navigation, db }) => {
+const Chat = ({ route, navigation, db, isConnected }) => {
   const { userID } = route.params;
   const { name } = route.params;
   const { color } = route.params;
   const [messages, setMessages] = useState([]);
-
-  // useEffect(() => {
-  //   navigation.setOptions({ title: name });
-  //   // Define query
-  //   const q = query(collection(db, 'messages'), orderBy('createdAt', 'desc'));
-  //   const unsubMessages = onSnapshot(q, (docs) => {
-  //     let newMessages = [];
-  //     docs.forEach((doc) => {
-  //       newMessages.push({
-  //         id: doc.id,
-  //         ...doc.data(),
-  //         createdAt: new Date(doc.data().createdAt.toMillis()),
-  //       });
-  //     });
-  //     setMessages(newMessages);
-  //   });
-  //   // Clean up code
-  //   return () => {
-  //     if (unsubMessages) unsubMessages();
-  //   };
-  // }, []);
-
 
   // The message to be added is the first item in the newMessages array (newMessages[0])
   const onSend = (newMessages) => {
@@ -60,36 +39,64 @@ const Chat = ({ route, navigation, db }) => {
   };
 
   // Fix short input space to type the message
+  // Render InputToolbar if online
   const renderInputToolbar = (props) => {
-    return (
-      <InputToolbar
-        {...props}
-        containerStyle={styles.inputContainer}
-        primaryStyle={styles.inputPrimary}
-      />
-    );
+    if (isConnected)
+      return (
+        <InputToolbar
+          {...props}
+          containerStyle={styles.inputContainer}
+          primaryStyle={styles.inputPrimary}
+        />
+      );
+    else return null;
   };
+
+  let unsubMessages;
 
   useEffect(() => {
     navigation.setOptions({ title: name });
-    // Define query
-    const q = query(collection(db, 'messages'), orderBy('createdAt', 'desc'));
-    const unsubMessages = onSnapshot(q, (docs) => {
-      let newMessages = [];
-      docs.forEach((doc) => {
-        newMessages.push({
-          id: doc.id,
-          ...doc.data(),
-          createdAt: new Date(doc.data().createdAt.toMillis()),
+    // If there’s a connection, fetch data from the Firestore Database
+    // Otherwise (else), call loadCachedLists()
+    if (isConnected === true) {
+      // Unregister current onSnapshot() listener to avoid registering
+      // multiple listeners when useEffect code is re-executed.
+      if (unsubMessages) unsubMessages();
+      unsubMessages = null;
+      // Define query
+      const q = query(collection(db, 'messages'), orderBy('createdAt', 'desc'));
+      unsubMessages = onSnapshot(q, (docs) => {
+        let newMessages = [];
+        docs.forEach((doc) => {
+          newMessages.push({
+            id: doc.id,
+            ...doc.data(),
+            createdAt: new Date(doc.data().createdAt.toMillis()),
+          });
         });
+        cacheMessages(newMessages);
+        setMessages(newMessages);
       });
-      setMessages(newMessages);
-    });
+    } else loadCachedMessages();
+
     // Clean up code
     return () => {
       if (unsubMessages) unsubMessages();
     };
-  }, []);
+  }, [isConnected]);
+
+  const cacheMessages = async (messagesToCache) => {
+    try {
+      await AsyncStorage.setItem('messages', JSON.stringify(messagesToCache));
+    } catch (error) {
+      console.log(error.message);
+    }
+  };
+
+  const loadCachedMessages = async () => {
+    const cachedMessages = (await AsyncStorage.getItem('messages')) || [];
+    setLists(JSON.parse(cachedMessages));
+  };
 
   return (
     <View style={[styles.container, { backgroundColor: color }]}>

@@ -8,7 +8,8 @@ import {
   ImageBackground,
   TouchableOpacity,
   KeyboardAvoidingView,
-  Platform, Alert
+  Platform,
+  Alert,
 } from 'react-native';
 
 const Start = ({ navigation }) => {
@@ -171,7 +172,6 @@ const styles = StyleSheet.create({
     width: '88%',
     padding: 20,
     marginBottom: 25,
-    // backgroundColor: '#757083',
     backgroundColor: '#1F435B',
     alignItems: 'center',
     alignSelf: 'center',
