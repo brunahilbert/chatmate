@@ -3,7 +3,7 @@ import Chat from './components/Chat';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { initializeApp } from 'firebase/app';
-import { getStorage } from "firebase/storage";
+import { getStorage } from 'firebase/storage';
 import {
   getFirestore,
   disableNetwork,

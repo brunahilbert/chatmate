@@ -1,8 +1,8 @@
 # ChatMate App
 
-<img src="img/chatmate01.png">
-<img src="img/chatmate02.png">
-<img src="img/chatmate03.png">
+<img src="img/chatmate01.png" height="700">
+<img src="img/chatmate02.png" height="700">
+<img src="img/chatmate03.png" height="700">
 
 The objective of this project is to build a chat app for **mobile devices** using **React Native**. The app will provide users with a chat interface and options to share images and their location.
 
