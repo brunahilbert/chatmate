@@ -3,6 +3,7 @@ import Chat from './components/Chat';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { initializeApp } from 'firebase/app';
+import { getStorage } from "firebase/storage";
 import {
   getFirestore,
   disableNetwork,
@@ -29,6 +30,9 @@ const App = () => {
   // Initialize Cloud Firestore and get a reference to the service
   const db = getFirestore(app);
 
+  // Initialize the storage handler
+  const storage = getStorage(app);
+
   // Define a state that represents the network connectivity status
   const connectionStatus = useNetInfo();
 
@@ -50,6 +54,7 @@ const App = () => {
             <Chat
               isConnected={connectionStatus.isConnected}
               db={db}
+              storage={storage}
               {...props}
             />
           )}
